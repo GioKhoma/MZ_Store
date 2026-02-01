@@ -1,12 +1,20 @@
 from rest_framework import serializers
-
-class ProductSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    description = serializers.CharField()
-    price = serializers.FloatField()
-    currency = serializers.ChoiceField(choices=['GEL', 'USD', 'EUR'])
-
 from .models import Review, Product
+
+# class ProductSerializer(serializers.Serializer):
+#     name = serializers.CharField()
+#     description = serializers.CharField()
+#     price = serializers.FloatField()
+#     currency = serializers.ChoiceField(choices=['GEL', 'USD', 'EUR'])
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        # fields = "__all__"
+        exclude = ['uuid', 'created_at', 'updated_at']
+        model = Product
+
+
 
 class ReviewSerializer(serializers.Serializer):
     product_id = serializers.IntegerField(write_only=True)

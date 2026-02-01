@@ -1,8 +1,20 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
+import uuid
+from django.utils import timezone
+
+class BaseModel(models.Model):
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True,)
+
+    created_at = models.DateTimeField(db_index=True, default=timezone.now) 
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
-class Product(models.Model):
+class Product(BaseModel):
     CURRENCY_CHOICES = [
         ('GEL', 'GEL'),
         ('USD', 'USD'),
