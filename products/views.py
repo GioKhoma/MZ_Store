@@ -1,3 +1,4 @@
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product
@@ -57,8 +58,8 @@ def products(request):
             return Response({"new product": product.id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-from .serializers import ReviewSerializer
-from .models import Review
+from .serializers import ReviewSerializer, CartSerializer
+from .models import Review, Cart
 
 
 @api_view(['GET', 'POST'])
@@ -187,6 +188,75 @@ class ProductAPIView(RetrieveModelMixin,
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+    
 
 
 
+from rest_framework.permissions import IsAuthenticated
+
+from .models import FavoriteProduct  
+from .serializers import FavoriteProductSerializer  
+
+
+class FavoriteProductViewSet(ListModelMixin,
+                            CreateModelMixin,
+                            DestroyModelMixin,
+                            RetrieveModelMixin,
+                            GenericAPIView):
+    
+    queryset = FavoriteProduct.objects.all()
+    serializer_class = FavoriteProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = self.queryset.filter(user=self.request.user)
+        return queryset
+
+    def get(self, request, pk=None, *args, **kwargs):
+        if pk:
+            return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+
+
+
+
+
+
+
+class CartView(ListModelMixin,
+            CreateModelMixin,
+            GenericAPIView):
+    
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = self.queryset.filter(user=self.request.user)
+        return queryset
+
+    def get(self, request, pk=None, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+from .models import ProductTag
+from .serializers import ProductTagSerializer
+
+class TagView(ListModelMixin, GenericAPIView):
+    
+    queryset = ProductTag.objects.all()
+    serializer_class = ProductTagSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)

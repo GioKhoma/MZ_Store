@@ -55,6 +55,9 @@ class FavoriteProduct(models.Model):
 class ProductTag(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Cart(models.Model):
     products = models.ManyToManyField('products.Product', related_name='carts')

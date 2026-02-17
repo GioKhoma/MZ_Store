@@ -10,4 +10,11 @@ urlpatterns = [
 
     path('products-genericapiview/', views.ProductAPIView.as_view(), name="products_genericapiview"),
     path('products-genericapiview/<int:pk>', views.ProductAPIView.as_view(), name='product_genericapiview'),
+
+    path("favorite-product/", views.FavoriteProductViewSet.as_view(), name="favorite_product"),
+    path("favorite-product/<int:pk>/", views.FavoriteProductViewSet.as_view()),
+
+    path("cart-flow/", views.CartView.as_view()),
+
+    path("tag-list/", views.TagView.as_view()),
 ]
