@@ -17,4 +17,10 @@ urlpatterns = [
     path("cart-flow/", views.CartView.as_view()),
 
     path("tag-list/", views.TagView.as_view()),
+    path("tags/", views.TagList.as_view()),
+
+    path("review-view/<int:product_id>/", views.ReviewView.as_view()),
+
+    path('product-model-view-set/', views.ProductModelViewSet.as_view({"get": "list", "post": "create"})),
+    path('product-model-view-set/<int:pk>/', views.ProductModelViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"})),
 ]

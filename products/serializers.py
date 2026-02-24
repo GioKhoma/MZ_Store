@@ -17,7 +17,7 @@ from .models import Review, Product, FavoriteProduct, Cart
 
 
 class ReviewSerializer(serializers.Serializer):
-    product_id = serializers.IntegerField(write_only=True)
+    product_id = serializers.IntegerField()
     content = serializers.CharField()
     rating = serializers.IntegerField()
 

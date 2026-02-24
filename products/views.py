@@ -260,3 +260,29 @@ class TagView(ListModelMixin, GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+    
+    
+from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.viewsets import ModelViewSet
+
+class TagList(ListAPIView):
+    queryset = ProductTag.objects.all()
+    serializer_class = ProductTagSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class ReviewView(ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = self.queryset.filter(product_id=self.kwargs['product_id'])
+        return queryset
+
+
+class ProductModelViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete']
