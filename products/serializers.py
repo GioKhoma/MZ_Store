@@ -138,4 +138,13 @@ class CartSerializer(serializers.ModelSerializer):
         cart, _ = Cart.objects.get_or_create(user=user)
         cart.products.add(*products)
 
-        return cart
+        return 
+    
+
+
+from .models import ProductImage
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', 'product']

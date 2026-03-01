@@ -1,8 +1,9 @@
 from django.urls import path
 from . import views
+from rest_framework.routers import SimpleRouter, DefaultRouter
 
 urlpatterns = [
-    path("products/", views.products, name="products"),
+    # path("products/", views.products, name="products"),
     path("reviews/", views.review_view, name="review_view"),
 
     path('product-apiview/', views.ProductView.as_view(), name='product'),
@@ -23,4 +24,22 @@ urlpatterns = [
 
     path('product-model-view-set/', views.ProductModelViewSet.as_view({"get": "list", "post": "create"})),
     path('product-model-view-set/<int:pk>/', views.ProductModelViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"})),
+
 ]
+
+from rest_framework_nested import routers
+
+# router = SimpleRouter()
+router = DefaultRouter()
+router.register('products', views.ProductModelViewSet)
+
+product_router = routers.NestedDefaultRouter(
+    router,
+    'products',
+    lookup='product',
+)
+
+product_router.register('images', views.ProductImageViewSet, basename="product_image")
+
+urlpatterns += router.urls
+urlpatterns += product_router.urls

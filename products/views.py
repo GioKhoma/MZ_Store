@@ -286,3 +286,20 @@ class ProductModelViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'delete']
+
+
+
+
+
+from .models import ProductImage
+from .serializers import ProductImageSerializer
+
+
+class ProductImageViewSet(ModelViewSet):
+    queryset = ProductImage.objects.all()
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete']
+
+    def get_queryset(self):
+        return self.queryset.filter(product__id=self.kwargs['product_pk'])
