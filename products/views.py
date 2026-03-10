@@ -281,11 +281,45 @@ class ReviewView(ListCreateAPIView):
         return queryset
 
 
+
+
+
+
+
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+from .pagination import ProductPagination
+
+
+
+
+
 class ProductModelViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['get', 'post', 'delete']
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['price', 'currency']
+    search_fields = ['name']
+    # pagination_class = ProductPagination
+
+
+    # http_method_names = ['get', 'post', 'delete']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
