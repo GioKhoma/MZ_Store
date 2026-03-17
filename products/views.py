@@ -289,7 +289,7 @@ class ReviewView(ListCreateAPIView):
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .pagination import ProductPagination
-
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle, ScopedRateThrottle
 
 
 
@@ -297,14 +297,14 @@ from .pagination import ProductPagination
 class ProductModelViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['price', 'currency']
     search_fields = ['name']
-    # pagination_class = ProductPagination
-
-
-    # http_method_names = ['get', 'post', 'delete']
+    pagination_class = ProductPagination
+    # throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'ragaca'
 
 
 

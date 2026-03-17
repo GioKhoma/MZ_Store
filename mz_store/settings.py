@@ -131,7 +131,15 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'products.pagination.ProductPagination',
-    'PAGE_SIZE': 10,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/day',
+        'user': '1000/day',
+        'ragaca': '10/minutes',
+    }
 }
