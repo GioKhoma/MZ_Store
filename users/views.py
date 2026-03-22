@@ -21,3 +21,21 @@ def user_view(request):
         user_list.append(user_data)
 
     return Response({'users': user_list})
+
+
+
+from rest_framework import viewsets, mixins
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .serializers import RegisterSerializer, UserSerializer
+
+
+class RegisterView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]  # Allows anyone to register
+    serializer_class = RegisterSerializer
+
+
+class UserListDetailViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]  # Requires the user to be authenticated
