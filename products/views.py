@@ -292,6 +292,23 @@ from .pagination import ProductPagination
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle, ScopedRateThrottle
 
 
+from .permissions import IsObjectOwnerOrReadOnly
+from rest_framework.exceptions import PermissionDenied
+
+class ReviewModelViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated, IsObjectOwnerOrReadOnly]
+    pagination_class = ProductPagination
+
+    def perform_update(self, serializer):
+        review = self.get_object()
+        if review.user != self.request.user:
+            raise PermissionDenied("You do not have permission to update this review.")
+        serializer.save()
+
+
+
 
 
 class ProductModelViewSet(ModelViewSet):

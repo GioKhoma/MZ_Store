@@ -32,6 +32,7 @@ from rest_framework_nested import routers
 # router = SimpleRouter()
 router = DefaultRouter()
 router.register('products', views.ProductModelViewSet)
+router.register('reviews', views.ReviewModelViewSet)
 
 product_router = routers.NestedDefaultRouter(
     router,

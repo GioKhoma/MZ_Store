@@ -16,35 +16,71 @@ from .models import Review, Product, FavoriteProduct, Cart
 
 
 
-class ReviewSerializer(serializers.Serializer):
-    product_id = serializers.IntegerField()
-    content = serializers.CharField()
-    rating = serializers.IntegerField()
+# class ReviewSerializer(serializers.Serializer):
+#     product_id = serializers.IntegerField()
+#     content = serializers.CharField()
+#     rating = serializers.IntegerField()
 
-    def validate_product_id(self, value):
-        try:
-            Product.objects.get(id=value)
-        except Product.DoesNotExist:
-            raise serializers.ValidationError("Invalid product_id. Product does not exist.")
+#     def perform_update(self, serializer):
+#         review = self.get_object()
+#         if review.user != self.request.user:
+#             raise PermissionDenied("You do not have permission to update this review.")
+#         serializer.save()
+
+#     def validate_product_id(self, value):
+#         try:
+#             Product.objects.get(id=value)
+#         except Product.DoesNotExist:
+#             raise serializers.ValidationError("Invalid product_id. Product does not exist.")
+#         return value
+
+#     def validate_rating(self, value):
+#         if value < 1 or value > 5:
+#             raise serializers.ValidationError("Rating must be between 1 and 5.")
+#         return value
+
+#     def create(self, validated_data):
+#         product = Product.objects.get(id=validated_data['product_id'])
+#         user = self.context['request'].user
+
+#         review = Review.objects.create(
+#             product=product,
+#             user=user,
+#             content=validated_data['content'],
+#             rating=validated_data['rating'],
+#         )
+#         return review
+    
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Review
+        fields = ['id', 'product', 'content', 'rating']
+        read_only_fields = ['id']
+
+    def validate_product(self, value):
+        # Django already ensures existence if PK is passed,
+        # but this keeps your custom validation style
+        if not value:
+            raise serializers.ValidationError("Product is required.")
         return value
 
     def validate_rating(self, value):
         if value < 1 or value > 5:
-            raise serializers.ValidationError("Rating must be between 1 and 5.")
+            raise serializers.ValidationError(
+                "Rating must be between 1 and 5."
+            )
         return value
 
     def create(self, validated_data):
-        product = Product.objects.get(id=validated_data['product_id'])
-        user = self.context['request'].user
+        request = self.context.get('request')
+        user = request.user if request and request.user.is_authenticated else None
 
-        review = Review.objects.create(
-            product=product,
+        return Review.objects.create(
             user=user,
-            content=validated_data['content'],
-            rating=validated_data['rating'],
+            **validated_data
         )
-        return review
-    
+
 
 
 
