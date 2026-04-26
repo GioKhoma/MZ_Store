@@ -25,6 +25,7 @@ urlpatterns = [
     # path('product-model-view-set/', views.ProductModelViewSet.as_view({"get": "list", "post": "create"})),
     # path('product-model-view-set/<int:pk>/', views.ProductModelViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"})),
 
+    path("send_email_view/", views.send_email_view, name="send_email_view"),
 ]
 
 from rest_framework_nested import routers

@@ -355,3 +355,63 @@ class ProductImageViewSet(ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(product__id=self.kwargs['product_pk'])
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail, get_connection
+
+
+@csrf_exempt
+def send_email_view(request):
+    if request.method == "GET":
+
+        sender_email = "k@gmail.com"
+        app_password = ""
+
+        subject = "Hardcoded Test Email"
+        message = "This email was sent from Django using hardcoded values."
+        recipient = "g@gmail.com"
+
+        try:
+            connection = get_connection(
+                backend="django.core.mail.backends.smtp.EmailBackend",
+                host="smtp.gmail.com",
+                port=587,
+                username=sender_email,
+                password=app_password,
+                use_tls=True,
+            )
+
+            send_mail(
+                subject,
+                message,
+                sender_email,
+                [recipient],
+                connection=connection,
+                fail_silently=False,
+            )
+
+            return JsonResponse({"message": "Email sent successfully"})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Only GET allowed"}, status=405)
