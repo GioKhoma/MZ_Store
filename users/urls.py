@@ -10,5 +10,6 @@ router.register('password-reset-request', views.PasswordResetRequestViewSet, bas
 
 urlpatterns = [
     path("password-reset-confirm/<uidb64>/<token>/", views.PasswordResetConfirmViewSet.as_view({'post': 'create'}), name="password-reset-confirm"),
+    path("celery_send_email/", views.send_test_email, name="send_test_email"),
     path('', include(router.urls)),
 ]

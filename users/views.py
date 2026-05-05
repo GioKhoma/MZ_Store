@@ -127,3 +127,28 @@ class PasswordResetConfirmViewSet(CreateModelMixin, GenericViewSet):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+
+
+
+
+
+
+
+
+
+
+
+from django.http import HttpResponse
+from .tasks import send_email_task
+
+
+def send_test_email(request):
+    send_email_task.delay(
+        subject="Celery Test Email",
+        message="This email was sent using Celery background task.",
+        recipient_list=["giokhomaa@gmail.com"],
+    )
+
+    return HttpResponse("Email task started!")
