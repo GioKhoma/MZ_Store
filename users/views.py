@@ -148,7 +148,7 @@ def send_test_email(request):
     send_email_task.delay(
         subject="Celery Test Email",
         message="This email was sent using Celery background task.",
-        recipient_list=["giokhomaa@gmail.com"],
+        recipient_list=["khomaainfo@gmail.com"],
     )
 
     return HttpResponse("Email task started!")

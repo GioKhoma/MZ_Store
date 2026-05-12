@@ -369,12 +369,12 @@ from django.core.mail import send_mail, get_connection
 def send_email_view(request):
     if request.method == "GET":
 
-        sender_email = "khomaainfo@gmail.com"
-        app_password = "nqiv lpxw nhxg wnkq"
+        sender_email = "giokhomaa@gmail.com"
+        app_password = "hjdj pzkl anhd zwcz"
 
         subject = "Hardcoded Test Email"
         message = "This email was sent from Django using hardcoded values."
-        recipient = "giokhomaa@gmail.com"
+        recipient = "khomaainfo@gmail.com"
 
         try:
             connection = get_connection(
