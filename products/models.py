@@ -21,7 +21,7 @@ class Product(BaseModel):
         ('EUR', 'EUR'),
     ]
         
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.FloatField()
 
@@ -33,11 +33,17 @@ class Product(BaseModel):
 
     tags = models.ManyToManyField("products.ProductTag", related_name='products', blank=True)
 
+    created_at = models.DateTimeField(default=timezone.now)
+
     def __str__(self):
         return self.name
 
     def average_rating(self):
         pass
+
+    def get_discounted_price(self, discount_percent):
+        discount_amount = self.price * discount_percent / 100
+        return self.price - discount_amount
 
 
 class Review(models.Model):
@@ -53,7 +59,7 @@ class FavoriteProduct(models.Model):
 
 
 class ProductTag(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

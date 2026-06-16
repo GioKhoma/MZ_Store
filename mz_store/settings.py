@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qgyay7!mpg_=c-pq)_gfy_+3cn9nit3*6xfg+hd+(#53^mo1-b'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -38,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -49,8 +52,11 @@ INSTALLED_APPS = [
     'categories',
 ]
 
+import os
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -58,6 +64,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 ROOT_URLCONF = 'mz_store.urls'
 
@@ -82,10 +92,21 @@ WSGI_APPLICATION = 'mz_store.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',  # კონტეინერის სახელი docker-compose-დან
+        'PORT': '5432',
     }
 }
 
@@ -137,19 +158,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 REST_FRAMEWORK = {
 
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '10000/day',
-        'user': '10000/day',
-        'ragaca': '10000/minutes',
-    }
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle'
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '10000/day',
+    #     'user': '10000/day',
+    #     'ragaca': '10000/minutes',
+    # }
 }
 
 from datetime import timedelta
@@ -181,10 +202,8 @@ from datetime import timedelta
 
 
 
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
+
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -197,13 +216,37 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_BROKER_URL = 'redis://default:YEIVHaJImsdTHywQNwRJgWOwKAyBUMcD@trolley.proxy.rlwy.net:16084'
+# CELERY_RESULT_BACKEND = 'redis://default:YEIVHaJImsdTHywQNwRJgWOwKAyBUMcD@trolley.proxy.rlwy.net:16084'
 
 
 
-# CELERY_BROKER_URL = os.getenv("REDIS_URL")
-# CELERY_RESULT_BACKEND = os.getenv("REDIS_URL")
+CELERY_BROKER_URL = os.getenv("REDIS_URL", os.getenv("REDIS_URL"))
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", os.getenv("REDIS_URL"))
 
 # CELERY_ACCEPT_CONTENT = ["json"]
 # CELERY_TASK_SERIALIZER = "json"
+
+
+
+
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",  # აქ შეცვალეთ, აქამდე იყო "redis://127.0.0.1:6379/1"
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}

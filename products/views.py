@@ -309,22 +309,139 @@ class ReviewModelViewSet(ModelViewSet):
 
 
 
+from django.core.cache import cache
 
+# class ProductModelViewSet(ModelViewSet):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     permission_classes = [IsAuthenticated]
+#     filter_backends = [DjangoFilterBackend, SearchFilter]
+#     filterset_fields = ['price', 'currency']
+#     search_fields = ['name']
+#     pagination_class = ProductPagination
+#     # throttle_classes = [AnonRateThrottle, UserRateThrottle]
+#     # throttle_classes = [ScopedRateThrottle]
+#     # throttle_scope = 'ragaca'
+
+#     def get_serialized_products(self):
+#         cache_key = 'products_list'
+#         cached_data = cache.get(cache_key)
+
+#         if cached_data:
+#             return cached_data
+
+#         queryset = self.filter_queryset(self.get_queryset())
+#         serializer = self.get_serializer(queryset, many=True)
+#         cache.set(cache_key, serializer.data, timeout=60*5)
+#         return serializer.data
+
+
+#     def list(self, request, *args, **kwargs):
+#         import time
+
+#         start = time.time()
+#         data = self.get_serialized_products()
+#         end = time.time()
+
+#         print(end - start)
+#         return Response(data)
+
+
+"""
+ProductModelViewSet
+
+This ViewSet provides full CRUD functionality for Product objects using
+Django REST Framework's ModelViewSet.
+
+Features:
+- Returns all products from database
+- Uses ProductSerializer for serialization
+- Allows access only to authenticated users
+- Supports filtering by price and currency
+- Supports searching by product name
+- Uses custom pagination
+- Implements caching for product list responses
+- Measures response serialization time for performance testing
+
+Caching Logic:
+The product list is cached for 5 minutes. If cached data exists,
+the database query and serialization process are skipped,
+which improves API performance.
+"""
 
 class ProductModelViewSet(ModelViewSet):
+
+    # Queryset containing all Product objects
     queryset = Product.objects.all()
+
+    # Serializer used for converting Product objects to JSON
     serializer_class = ProductSerializer
+
+    # Only authenticated users can access this ViewSet
     permission_classes = [IsAuthenticated]
+
+    # Enables filtering and searching functionality
     filter_backends = [DjangoFilterBackend, SearchFilter]
+
+    # Fields allowed for exact filtering
     filterset_fields = ['price', 'currency']
+
+    # Fields used for search queries
     search_fields = ['name']
+
+    # Custom pagination class
     pagination_class = ProductPagination
+
+    # Optional throttling examples
     # throttle_classes = [AnonRateThrottle, UserRateThrottle]
+
+    # Scoped throttling example
     # throttle_classes = [ScopedRateThrottle]
     # throttle_scope = 'ragaca'
 
+    def get_serialized_products(self):
 
+        # Unique cache key name
+        cache_key = 'products_list'
 
+        # Try to get cached data
+        cached_data = cache.get(cache_key)
+
+        # Return cached data if it exists
+        if cached_data:
+            return cached_data
+
+        # Apply filtering and searching to queryset
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Serialize queryset data
+        serializer = self.get_serializer(queryset, many=True)
+
+        # Store serialized data in cache for 5 minutes
+        cache.set(cache_key, serializer.data, timeout=60*5)
+
+        # Return serialized data
+        return serializer.data
+
+    def list(self, request, *args, **kwargs):
+
+        # Import time module for performance measurement
+        import time
+
+        # Save start time
+        start = time.time()
+
+        # Get serialized product data
+        data = self.get_serialized_products()
+
+        # Save end time
+        end = time.time()
+
+        # Print execution time in terminal
+        print(end - start)
+
+        # Return API response
+        return Response(data)
 
 
 
@@ -401,3 +518,15 @@ def send_email_view(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Only GET allowed"}, status=405)
+
+
+
+
+from .tasks import delete_old_products
+from django.http import HttpResponse
+
+
+def delete_old_products_view(request):
+    task = delete_old_products.delay()
+
+    return HttpResponse("Celery start working...")
